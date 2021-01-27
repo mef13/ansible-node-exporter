@@ -49,3 +49,31 @@
   when:
     - ansible_version.full is version_compare('2.4', '>=')
     - ansible_selinux.status == "enabled"
+
+- name: Check if node_exporter environment file is exist
+  stat:
+    path: "/etc/node_exporter/node_exporter.env"
+  register: __node_exporter_env_exist
+  check_mode: false
+#  tags:
+#    - node_exporter_install
+
+- block:
+  - name: Create node_exporter config directory
+    file:
+      path: "/etc/node_exporter"
+      state: directory
+      owner: root
+      group: root
+      mode: u+rwX,g+rwX,o=rX
+
+  - name: Copy environment file
+    copy:
+      src: node_exporter.env
+      dest: /etc/node_exporter/node_exporter.env 
+      mode: 644
+      group: root
+      owner: root
+    become: yes
+  when:
+    not __node_exporter_env_exist.stat.exists

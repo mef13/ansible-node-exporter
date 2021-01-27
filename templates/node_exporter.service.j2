@@ -8,7 +8,8 @@ After=network-online.target
 Type=simple
 User={{ _node_exporter_system_user }}
 Group={{ _node_exporter_system_group }}
-ExecStart={{ _node_exporter_binary_install_dir }}/node_exporter \
+EnvironmentFile=/etc/node_exporter/node_exporter.env
+ExecStart={{ _node_exporter_binary_install_dir }}/node_exporter $OPTIONS \
 {% for collector in node_exporter_enabled_collectors -%}
 {%   if not collector is mapping %}
     --collector.{{ collector }} \
